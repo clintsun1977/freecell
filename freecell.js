@@ -516,7 +516,7 @@ function computeLayout() {
   const foundX = i => left + G - (4 - i) * cw - (3 - i) * sg;
   const topY = ch * 0.085;
   const colY = topY + ch * 1.145;
-  const avail = Math.max(ch * 1.5, H - colY - ch - ch * 0.05);
+  const avail = Math.max(ch * 0.6, H - colY - ch - ch * 0.05);
   L = { cw, ch, gap: ch * 0.05, colX, cellX, foundX, topY, colY, avail };
   board.style.width = W + 'px';
   board.style.setProperty('--cw', cw + 'px');
@@ -524,8 +524,8 @@ function computeLayout() {
 
 function colOffset(n) {
   if (n <= 1) return 0;
-  // 角标约占牌高的 25%，空间不够时最多压到 21%
-  return Math.max(L.ch * 0.21, Math.min(L.ch * 0.25, L.avail / (n - 1)));
+  // 正常间距为牌高的 25%；画面不能滚动，所以列太长时继续压缩，保证整列都在屏幕内
+  return Math.max(L.ch * 0.08, Math.min(L.ch * 0.25, L.avail / (n - 1)));
 }
 
 /** 计算每张牌的位置；movedIds 内的牌在动画期间临时置顶 */
@@ -588,6 +588,14 @@ function onPointerDown(e) {
   drag = { c, loc, x0: e.clientX, y0: e.clientY, active: false, ids: [], id: e.pointerId };
   window.addEventListener('pointermove', onPointerMove);
   window.addEventListener('pointerup', onPointerUp, { once: true });
+  window.addEventListener('pointercancel', onPointerCancel, { once: true });
+}
+
+function onPointerCancel() {
+  window.removeEventListener('pointermove', onPointerMove);
+  window.removeEventListener('pointerup', onPointerUp);
+  document.querySelectorAll('.slot.drop-ok').forEach(s => s.classList.remove('drop-ok'));
+  if (drag) { drag = null; render(); }
 }
 
 function onPointerMove(e) {
@@ -613,6 +621,7 @@ function onPointerMove(e) {
 
 async function onPointerUp(e) {
   window.removeEventListener('pointermove', onPointerMove);
+  window.removeEventListener('pointercancel', onPointerCancel);
   document.querySelectorAll('.slot.drop-ok').forEach(s => s.classList.remove('drop-ok'));
   if (!drag) return;
   const d = drag; drag = null;
@@ -929,6 +938,39 @@ window.addEventListener('keydown', e => {
 window.addEventListener('resize', () => { computeLayout(); render(); });
 window.addEventListener('orientationchange', () => setTimeout(() => { computeLayout(); render(); }, 300));
 document.addEventListener('fullscreenchange', () => setTimeout(() => { computeLayout(); render(); }, 50));
+
+// ---------- 锁定画面：不缩放、不滚动 ----------
+(() => {
+  const stop = e => e.preventDefault();
+  const opt = { passive: false };
+  // Safari 的双指缩放手势
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, stop, opt));
+  // 多指触摸（双指缩放），以及弹窗外的任何拖动滚动
+  document.addEventListener('touchstart', e => { if (e.touches.length > 1) e.preventDefault(); }, opt);
+  document.addEventListener('touchmove', e => {
+    if (e.touches.length > 1 || !e.target.closest('#modal .box')) e.preventDefault();
+  }, opt);
+  // 双击放大：第二次轻点时阻止默认行为；若点的是按钮，手动补发一次点击
+  let lastEnd = 0;
+  document.addEventListener('touchend', e => {
+    const now = Date.now();
+    if (now - lastEnd < 400 && e.changedTouches.length === 1) {
+      e.preventDefault();
+      const btn = e.target.closest('button');
+      if (btn && !btn.disabled) btn.click();
+    }
+    lastEnd = now;
+  }, opt);
+  document.addEventListener('dblclick', stop, opt);
+  document.addEventListener('contextmenu', e => { if (!e.target.closest('input')) e.preventDefault(); });
+  // 电脑浏览器：Ctrl+滚轮、触控板双指缩放、Ctrl +/-/0
+  window.addEventListener('wheel', e => { if (e.ctrlKey || e.metaKey) e.preventDefault(); }, opt);
+  window.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && ['+', '=', '-', '_', '0'].includes(e.key)) e.preventDefault();
+  }, opt);
+  // 万一页面被系统滚动了，立即复位
+  window.addEventListener('scroll', () => { if (window.scrollX || window.scrollY) window.scrollTo(0, 0); });
+})();
 
 injectSprite();
 buildFigures();
