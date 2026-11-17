@@ -502,9 +502,10 @@ const slotEl = p => slots[p.type][p.idx];
  * 空位上沿距顶栏 0.085 牌高，空位与牌列之间 0.145 牌高；叠放间距 0.25 牌高
  */
 function computeLayout() {
-  const W = document.documentElement.clientWidth;
-  const barH = $('bar').offsetHeight, toolH = $('toolbar').offsetHeight;
-  const H = window.innerHeight - barH - toolH;
+  // 可用区域：顶栏以下、右侧工具栏以左
+  const W = Math.max(200, $('toolbar').getBoundingClientRect().left - board.getBoundingClientRect().left);
+  const barH = $('bar').offsetHeight;
+  const H = window.innerHeight - barH - 16;
   const cw = Math.max(36, Math.min(W / 11.09, H / (3.9 * CARD_RATIO)));
   const ch = cw * CARD_RATIO;
   const g = cw * 0.35, sg = cw * 0.27;
@@ -860,7 +861,28 @@ function help() {
 const restartGame = () => confirmLeave(() => { const n = S.gameNo; if (S.started && !S.won) { const st = loadStats(); st.streak = 0; saveStats(st); } S = null; startGame(n); });
 const newGame = () => confirmLeave(() => startGame(randomGameNo()));
 function toggleSound() { Sound.toggle(); toast(Sound.muted ? '音效已关闭' : '音效已开启'); }
+// iPad / iPhone：Safari 的网页全屏模式下频繁点击会弹出"网站可能在诱导你输入密码"的安全警告，
+// 所以在这些设备上不用全屏 API，而是引导用户"添加到主屏幕"，从主屏幕图标打开即为全屏，没有警告。
+const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const IS_STANDALONE = window.matchMedia('(display-mode: standalone)').matches
+  || window.matchMedia('(display-mode: fullscreen)').matches || window.navigator.standalone === true;
+if (IS_STANDALONE) document.documentElement.classList.add('standalone');
+
+function iosFullscreenHelp() {
+  showModal(`<h2>在 iPad 上全屏玩</h2>
+    <p>把游戏添加到主屏幕，就能像 App 一样全屏打开：</p>
+    <ol class="steps">
+      <li>点 Safari 地址栏右侧的 <b>分享</b> 按钮（方框加向上箭头）</li>
+      <li>在菜单里选 <b>添加到主屏幕</b></li>
+      <li>点右上角 <b>添加</b></li>
+      <li>以后从主屏幕上的 <b>空当接龙</b> 图标打开即可</li>
+    </ol>
+    <p class="note">这种方式不会出现"网站诱导输入密码"的警告。Safari 自带的网页全屏模式会对频繁点击发出这个警告，所以在 iPad 上不再使用它。</p>`,
+    [{ label: '知道了', primary: true }]);
+}
+
 function toggleFullscreen() {
+  if (IS_IOS) { iosFullscreenHelp(); return; }
   if (document.fullscreenElement) document.exitFullscreen?.();
   else document.documentElement.requestFullscreen?.().catch(() => toast('浏览器不允许全屏'));
 }
@@ -885,7 +907,7 @@ $('btn-score').onclick = () => showModal(`<h2>得分</h2>
   ${statsHtml(loadStats())}`, [{ label: '确定', primary: true }]);
 $('btn-menu').onclick = () => menuModal('菜单', [
   { label: (Sound.muted ? '🔇 音效：关（点击开启）' : '🔊 音效：开（点击关闭）'), fn: toggleSound },
-  { label: '⛶ 全屏 / 退出全屏', fn: toggleFullscreen },
+  ...(IS_STANDALONE ? [] : [{ label: IS_IOS ? '⛶ 全屏玩（添加到主屏幕）' : '⛶ 全屏 / 退出全屏', fn: toggleFullscreen }]),
   { label: '❓ 玩法说明', fn: help },
 ]);
 $('btn-full').onclick = toggleFullscreen;
@@ -905,6 +927,7 @@ window.addEventListener('keydown', e => {
   else if (e.key === 'Escape') { selected = null; render(); }
 });
 window.addEventListener('resize', () => { computeLayout(); render(); });
+window.addEventListener('orientationchange', () => setTimeout(() => { computeLayout(); render(); }, 300));
 document.addEventListener('fullscreenchange', () => setTimeout(() => { computeLayout(); render(); }, 50));
 
 injectSprite();

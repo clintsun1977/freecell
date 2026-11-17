@@ -2,7 +2,16 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <!-- 添加到主屏幕后像 App 一样全屏打开（iPad 上用这种方式全屏，不会触发 Safari 的全屏警告） -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="空当接龙" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#125a2e" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <title>空当接龙</title>
   <!-- 牌面点数字体：联网时加载，离线时退回系统衬线字体 -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -24,7 +33,7 @@
 
   <main id="board"></main>
 
-  <footer id="toolbar">
+  <aside id="toolbar">
     <div class="tb-group">
       <button id="btn-game" class="tool" title="游戏选项">
         <span class="ring"><svg viewBox="0 0 24 24"><rect x="5" y="3.5" width="12" height="16" rx="2"/><path d="M8 7.5h0M11 14.5c0-2 2.5-2.6 2.5-4.4a1.5 1.5 0 0 0-2.5-1.1 1.5 1.5 0 0 0-2.5 1.1c0 1.8 2.5 2.4 2.5 4.4zM11 14.5l-1 1.5h2z" class="fill"/></svg></span>
@@ -57,7 +66,7 @@
         <span class="lbl">菜单</span>
       </button>
     </div>
-  </footer>
+  </aside>
 
   <div id="toast"></div>
   <div id="modal" class="hidden"><div class="box" id="modal-box"></div></div>
