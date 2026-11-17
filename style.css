@@ -22,7 +22,8 @@ html, body {
   overflow: hidden; overscroll-behavior: none;
   touch-action: none;
 }
-html { position: fixed; inset: 0; }
+/* 最外层纯色底：iPad Safari 万一画不出渐变，看到的也是绿色而不是白色 */
+html { position: fixed; inset: 0; background-color: var(--felt-mid); }
 body {
   color: var(--text);
   font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
@@ -30,7 +31,9 @@ body {
   -webkit-touch-callout: none;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
-  background: linear-gradient(180deg, var(--felt-top) 0%, var(--felt-mid) 40%, var(--felt-bot) 100%) fixed;
+  /* 不用 background-attachment: fixed —— iPad Safari 不支持，且与固定定位的 body 一起用时会整个变白 */
+  background-color: var(--felt-mid);
+  background-image: linear-gradient(180deg, var(--felt-top) 0%, var(--felt-mid) 40%, var(--felt-bot) 100%);
   position: fixed; inset: 0;
 }
 
