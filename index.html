@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>空当接龙</title>
+  <!-- 牌面点数字体：联网时加载，离线时退回系统衬线字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&display=swap" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header id="bar">
+    <div class="title">空当接龙 - #<span id="game-no">1</span></div>
+    <div class="status">
+      <span>得分: <b id="score">0</b></span>
+      <span>时间: <b id="time">00:00</b></span>
+      <button id="btn-full" class="icon-btn" title="全屏">
+        <svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="board"></main>
+
+  <footer id="toolbar">
+    <div class="tb-group">
+      <button id="btn-game" class="tool" title="游戏选项">
+        <span class="ring"><svg viewBox="0 0 24 24"><rect x="5" y="3.5" width="12" height="16" rx="2"/><path d="M8 7.5h0M11 14.5c0-2 2.5-2.6 2.5-4.4a1.5 1.5 0 0 0-2.5-1.1 1.5 1.5 0 0 0-2.5 1.1c0 1.8 2.5 2.4 2.5 4.4zM11 14.5l-1 1.5h2z" class="fill"/></svg></span>
+        <span class="lbl">游戏</span>
+      </button>
+      <button id="btn-new" class="tool" title="新游戏 (F2)">
+        <span class="ring"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
+        <span class="lbl">新</span>
+      </button>
+      <button id="btn-undo" class="tool" title="撤销 (Ctrl+Z)">
+        <span class="ring"><svg viewBox="0 0 24 24"><path d="M8.5 6.5H4.5V2.5"/><path d="M5 6.2A8 8 0 1 1 4.6 15"/></svg></span>
+        <span class="lbl">撤销</span>
+      </button>
+      <button id="btn-hint" class="tool" title="提示 (H)">
+        <span class="ring"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2h5c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></svg></span>
+        <span class="lbl">提示</span>
+      </button>
+      <button id="btn-auto" class="tool" title="自动播放：把能收的牌全部收到右上角 (A)">
+        <span class="ring"><svg viewBox="0 0 24 24"><path d="M4 20 15 9M13.5 7.5l3 3"/><path d="M17 3v3M15.5 4.5h3M20 8v2M19 9h2M10 3v2M9 4h2"/></svg></span>
+        <span class="lbl">自动播放</span>
+      </button>
+    </div>
+    <div class="tb-group">
+      <button id="btn-score" class="tool" title="得分与统计">
+        <span class="ring"><svg viewBox="0 0 24 24"><path d="M4 8l4 4 4-6 4 6 4-4-1.5 10h-13z"/><path d="M5.5 21h13"/></svg></span>
+        <span class="lbl">得分</span>
+      </button>
+      <button id="btn-menu" class="tool" title="菜单">
+        <span class="ring"><svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h14"/></svg></span>
+        <span class="lbl">菜单</span>
+      </button>
+    </div>
+  </footer>
+
+  <div id="toast"></div>
+  <div id="modal" class="hidden"><div class="box" id="modal-box"></div></div>
+  <script src="cards/svg-cards.js"></script>
+  <script src="freecell.js"></script>
+</body>
+</html>

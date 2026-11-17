@@ -1,0 +1,181 @@
+:root {
+  --felt-top: #125a2e;
+  --felt-mid: #176c39;
+  --felt-bot: #135f31;
+  --text: #ffffff;
+  --red: #e6180a;
+  --black: #111316;
+  --sel: #ffd84a;
+  --hint: #63d4ff;
+  --bar-h: 58px;
+  --tool-h: 108px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  color: var(--text);
+  font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  user-select: none; -webkit-user-select: none;
+  touch-action: manipulation;
+  background: linear-gradient(180deg, var(--felt-top) 0%, var(--felt-mid) 40%, var(--felt-bot) 100%) fixed;
+  overflow-x: hidden;
+}
+
+/* ---------- 顶栏：标题 + 得分/时间 ---------- */
+#bar {
+  height: var(--bar-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1.2vw 0 0.9vw;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+#bar .title { font-size: clamp(18px, 2.3vw, 34px); letter-spacing: 0.5px; white-space: nowrap; }
+#bar .status { display: flex; align-items: center; gap: clamp(14px, 4.5vw, 76px); font-size: clamp(15px, 1.85vw, 27px); }
+#bar .status b { font-weight: 500; font-size: 1.22em; font-variant-numeric: tabular-nums; margin-left: 4px; }
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; padding: 0; }
+.icon-btn { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
+.icon-btn:hover { background: rgba(255, 255, 255, 0.12); }
+.icon-btn svg { width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- 牌桌 ---------- */
+#board { position: relative; margin: 0 auto; padding-bottom: var(--tool-h); }
+
+.slot {
+  position: absolute;
+  border-radius: calc(var(--cw) * 0.085);
+  border: calc(var(--cw) * 0.024) solid rgba(8, 70, 34, 0.55);
+  background: rgba(0, 0, 0, 0.035);
+  transition: border-color .15s, box-shadow .15s;
+}
+.slot[data-type="found"] { border-color: rgba(150, 225, 180, 0.42); background: rgba(255, 255, 255, 0.02); }
+.slot.col { border: none; background: none; }
+.slot.drop-ok { border-color: var(--sel) !important; box-shadow: 0 0 16px rgba(255, 216, 74, .6); }
+.slot.col.drop-ok { border: calc(var(--cw) * 0.02) dashed var(--sel) !important; }
+
+/* ---------- 牌 ---------- */
+.card {
+  position: absolute; left: 0; top: 0;
+  width: var(--cw); height: calc(var(--cw) * 1.36);
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: calc(var(--cw) * 0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+  cursor: pointer; overflow: hidden;
+  transition: left .22s cubic-bezier(.22,.8,.3,1), top .22s cubic-bezier(.22,.8,.3,1), box-shadow .15s;
+  color: var(--black);
+}
+.card.red { color: var(--red); }
+.card svg { display: block; pointer-events: none; }
+.card.dragging { transition: none; box-shadow: 0 14px 28px rgba(0,0,0,.42), 0 4px 10px rgba(0,0,0,.28); cursor: grabbing; }
+.card.sel { box-shadow: 0 0 0 3px var(--sel), 0 0 16px rgba(255, 216, 74, .55); }
+.card.hint { box-shadow: 0 0 0 3px var(--hint), 0 0 18px var(--hint); }
+
+/* 角标：点数在上、小花色在下，靠左边缘竖排 */
+.card .corner {
+  position: absolute; width: calc(var(--cw) * 0.17);
+  display: flex; flex-direction: column; align-items: center;
+  line-height: 1;
+}
+.card .corner b {
+  font-family: "Playfair Display", Cambria, Georgia, "Times New Roman", serif;
+  font-size: calc(var(--cw) * 0.205); font-weight: 900; letter-spacing: -0.02em;
+  -webkit-text-stroke: calc(var(--cw) * 0.003) currentColor;
+  font-feature-settings: "lnum" 1; line-height: 1;
+}
+.card .corner b.jack { font-size: calc(var(--cw) * 0.19); transform: translateY(-0.12em); margin-bottom: -0.1em; }
+.card .corner b.ten { font-size: calc(var(--cw) * 0.175); letter-spacing: -0.09em; margin-left: -0.08em; }
+.card .corner .cs { width: calc(var(--cw) * 0.11); height: calc(var(--cw) * 0.113); margin-top: calc(var(--cw) * 0.012); }
+.card .corner.tl { top: calc(var(--cw) * 0.035); left: calc(var(--cw) * 0.01); }
+.card .corner.br { bottom: calc(var(--cw) * 0.035); right: calc(var(--cw) * 0.01); transform: rotate(180deg); }
+
+/* 数字牌点阵：最上一排靠近顶边，叠放时能看到 */
+.card .pip {
+  position: absolute; width: calc(var(--cw) * 0.2); height: calc(var(--cw) * 0.206);
+  transform: translate(-50%, -50%);
+}
+.card .pip.flip { transform: translate(-50%, -50%) rotate(180deg); }
+
+/* A */
+.card .ace {
+  position: absolute; left: 50%; top: 50%; width: calc(var(--cw) * 0.36); height: calc(var(--cw) * 0.37);
+  transform: translate(-50%, -50%);
+}
+
+/* 人头牌：人物放在画框里，角标在画框外的左上 / 右下 */
+.card .art {
+  position: absolute;
+  left: calc(var(--cw) * 0.19); right: calc(var(--cw) * 0.19);
+  top: calc(var(--cw) * 0.1); bottom: calc(var(--cw) * 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.45);
+  border-radius: calc(var(--cw) * 0.025);
+  background: #f7f4ec;
+  overflow: hidden;
+}
+.card .art svg { width: 100%; height: 100%; }
+
+/* ---------- 底部工具栏：圆形图标按钮 ---------- */
+#toolbar {
+  position: fixed; left: 0; right: 0; bottom: 0; height: var(--tool-h);
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0 2.6vw 0 2.6vw; z-index: 1200; pointer-events: none;
+}
+.tb-group { display: flex; gap: clamp(10px, 3.6vw, 70px); pointer-events: auto; }
+.tool { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 64px; }
+.tool .ring {
+  width: clamp(44px, 3.9vw, 64px); height: clamp(44px, 3.9vw, 64px); border-radius: 50%;
+  border: 3px solid #fff; display: flex; align-items: center; justify-content: center;
+  transition: background .15s, transform .1s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.18);
+}
+.tool .ring svg { width: 58%; height: 58%; fill: none; stroke: #fff; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
+.tool .ring svg .fill { fill: #fff; stroke: none; }
+.tool .lbl { font-size: clamp(13px, 1.3vw, 19px); text-shadow: 0 1px 2px rgba(0,0,0,.3); white-space: nowrap; }
+.tool:hover:not(:disabled) .ring { background: rgba(255, 255, 255, 0.15); }
+.tool:active:not(:disabled) .ring { transform: scale(0.94); }
+.tool:disabled { opacity: 0.4; cursor: default; }
+
+/* ---------- 提示与弹窗 ---------- */
+#toast {
+  position: fixed; left: 50%; bottom: calc(var(--tool-h) + 10px); transform: translateX(-50%) translateY(20px);
+  background: rgba(0, 0, 0, .78); color: #fff; padding: 10px 20px; border-radius: 999px;
+  opacity: 0; pointer-events: none; transition: all .25s; font-size: 15px; z-index: 3000;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+#modal {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, .5); z-index: 2000;
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+}
+#modal.hidden { display: none; }
+#modal .box {
+  background: #fff; color: #222; border-radius: 14px; padding: 22px 26px; width: min(440px, 100%);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .45); line-height: 1.75;
+  animation: pop .2s ease-out;
+}
+@keyframes pop { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+#modal h2 { margin: 0 0 8px; font-size: 22px; color: #1b6e3c; }
+#modal .btns { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+#modal button { padding: 7px 16px; border-radius: 8px; background: #eef1ee; border: 1px solid #d3dad4; color: #222; font-size: 15px; }
+#modal button:hover { background: #e2e8e3; }
+#modal button.primary { background: #23914f; border-color: #1b7840; color: #fff; }
+#modal button.primary:hover { background: #1f8547; }
+#modal .menu { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+#modal .menu button { text-align: left; padding: 10px 14px; font-size: 16px; }
+#modal input { font: inherit; font-size: 18px; padding: 8px 12px; width: 100%; border: 1px solid #bbb; border-radius: 8px; }
+#modal .stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px 18px; margin: 12px 0;
+  padding: 12px 14px; background: #f1f6f2; border-radius: 10px;
+}
+#modal .stats b { float: right; color: #1b6e3c; }
+#modal ul { padding-left: 20px; margin: 6px 0; }
+
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
+.card.celebrate { animation: bounce .6s ease infinite; }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+.card.shake { animation: shake .35s ease; }
+
+@media (max-width: 700px) {
+  :root { --bar-h: 46px; --tool-h: 84px; }
+  .tool { min-width: 44px; }
+  .tool .lbl { font-size: 12px; }
+}
