@@ -937,7 +937,16 @@ window.addEventListener('keydown', e => {
 });
 window.addEventListener('resize', () => { computeLayout(); render(); });
 window.addEventListener('orientationchange', () => setTimeout(() => { computeLayout(); render(); }, 300));
-document.addEventListener('fullscreenchange', () => setTimeout(() => { computeLayout(); render(); }, 50));
+// 全屏按钮：进入全屏后换成"退出全屏"图标，并提示退出方法
+const FULL_ICON = '<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7"/></svg>';
+const EXIT_ICON = '<svg viewBox="0 0 24 24"><path d="M20 10h-6V4M14 10l7-7M4 14h6v6M10 14l-7 7"/></svg>';
+document.addEventListener('fullscreenchange', () => {
+  const on = !!document.fullscreenElement;
+  $('btn-full').innerHTML = on ? EXIT_ICON : FULL_ICON;
+  $('btn-full').title = on ? '退出全屏（Esc）' : '全屏';
+  if (on) toast('按 Esc 键，或再点右上角按钮，即可退出全屏', 3500);
+  setTimeout(() => { computeLayout(); render(); }, 50);
+});
 
 // ---------- 锁定画面：不缩放、不滚动 ----------
 (() => {

@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&display=swap" />
-  <link rel="stylesheet" href="style.css?v=20261117c" />
+  <link rel="stylesheet" href="style.css?v=20261117d" />
 </head>
 <body>
   <header id="bar">
@@ -43,10 +43,6 @@
         <span class="ring"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
         <span class="lbl">新</span>
       </button>
-      <button id="btn-undo" class="tool" title="撤销 (Ctrl+Z)">
-        <span class="ring"><svg viewBox="0 0 24 24"><path d="M8.5 6.5H4.5V2.5"/><path d="M5 6.2A8 8 0 1 1 4.6 15"/></svg></span>
-        <span class="lbl">撤销</span>
-      </button>
       <button id="btn-hint" class="tool" title="提示 (H)">
         <span class="ring"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2h5c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></svg></span>
         <span class="lbl">提示</span>
@@ -54,6 +50,10 @@
       <button id="btn-auto" class="tool" title="自动播放：把能收的牌全部收到右上角 (A)">
         <span class="ring"><svg viewBox="0 0 24 24"><path d="M4 20 15 9M13.5 7.5l3 3"/><path d="M17 3v3M15.5 4.5h3M20 8v2M19 9h2M10 3v2M9 4h2"/></svg></span>
         <span class="lbl">自动播放</span>
+      </button>
+      <button id="btn-undo" class="tool" title="撤销 (Ctrl+Z)">
+        <span class="ring"><svg viewBox="0 0 24 24"><path d="M8.5 6.5H4.5V2.5"/><path d="M5 6.2A8 8 0 1 1 4.6 15"/></svg></span>
+        <span class="lbl">撤销</span>
       </button>
     </div>
     <div class="tb-group">
@@ -70,7 +70,7 @@
 
   <div id="toast"></div>
   <div id="modal" class="hidden"><div class="box" id="modal-box"></div></div>
-  <script src="cards/svg-cards.js?v=20261117c"></script>
-  <script src="freecell.js?v=20261117c"></script>
+  <script src="cards/svg-cards.js?v=20261117d"></script>
+  <script src="freecell.js?v=20261117d"></script>
 </body>
 </html>
